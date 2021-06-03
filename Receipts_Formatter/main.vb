@@ -1,5 +1,14 @@
 Sub Receipt_Formatter()
 
+'issues:
+'1) Some amt based orders have numbers in their items string that dont refer to total order qty
+'2) Determine why some shipment_qty outputs are decimal
+'2a) Collect example cases of decimal outputs
+'3) Duration calculation only works 100% of the time for dates in the same year
+'4) need a way to add consumable ID to the output or the export data , might need new source for export
+'5) Rows only expanded for first conusmables encountered in "Items" column
+
+
 'This sub routine formats coupa receipt export data into a format that can be used to
 'generate pivot tables and pivot charts
 
@@ -22,22 +31,22 @@ Counter = 2 ' Starting row of summary table
 
 'Start For Loop
 
-'For Row = 2 To Last_Row
+For Row = 2 To Last_Row
 
 
 ' Assigning values
 
-Start_Date = Cells(34, 4).Value
+Start_Date = Cells(Row, 4).Value
 
 
 'Determining the duration of a blanket order
-Start_Month = Int(Left(Cells(34, 4).Value, 2)) 'Start month of blanket order
-End_Month = Left(Cells(34, 5).Value, 2) ' End month of blanket order
+Start_Month = Int(Left(Cells(Row, 4).Value, 2)) 'Start month of blanket order
+End_Month = Left(Cells(Row, 5).Value, 2) ' End month of blanket order
 Duration = Abs(Int((End_Month - Start_Month))) + 1 'Fix_1:apply absolute function to difference
 
 'Extracting the total items ordered on the blanket order
 'split "Items" by individual line Item
-Items = Split(Cells(34, 7).Value, ",")
+Items = Split(Cells(Row, 7).Value, ",")
 
 'looping through the first 4 characters of each line Item
 Curr_Str = ""
@@ -69,7 +78,7 @@ End If
 'issue_1: Negative Duration causes infinite loop
 While Duration <> 0
 
-Cells(Counter, 13).Value = Cells(34, 6).Value
+Cells(Counter, 13).Value = Cells(Row, 6).Value
 Cells(Counter, 14).Value = Total_Ordered
 Cells(Counter, 15).Value = Start_Date
 Cells(Counter, 16).Value = Shipment_Qty
@@ -79,7 +88,7 @@ Counter = Counter + 1
 Duration = Duration - 1
 Wend
 
-'Next Row
+Next Row
     
 'End For loop
 
