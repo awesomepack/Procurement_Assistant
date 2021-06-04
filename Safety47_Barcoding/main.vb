@@ -1,46 +1,67 @@
 Sub Safety_47()
 'Takes the Number of compound plates in a screening week , and returns a table of assay barcode values for csv export.
 
+'To Do:
+'Need to keep Assay list and output in seperate sheets
+'Add Plate Type Column to output table
+'Format output table headers
 
-'Declare Array to hold values for 72 unique Assays
-Dim SFTY(1 To 72) As String
-Dim Compound_Plate(1 To 10) As String
+
+'Declare collections to store assay values and user input
+Dim SFTY As New Collection
+Dim Compound_Plates As New Collection
+Dim Last_Row As Long
+Dim New_Plate As Boolean
+
+'Finding the last row with values
+Last_Row = Cells(Rows.Count, 1).End(xlUp).Row
+
 
 'read in assay values from Assay list
-'For R = 1 To UBound(SFTY)
+For R = 1 To Last_Row
 
-'SFTY(R) = Cells(R + 1, 1).Value 'assigning assay values to array
+SFTY.Add Cells(R + 1, 1).Value 'assigning assay values to collection
 
-'Next R
+Next R
+
+'Request user for compound plate ID's
+'Terminate when finished
+Compound_Plates.Add InputBox("Please enter the compound plate ID", "Compound Plates") 'Ask the user for first ID
+
+New_Plate = True 'initialize boolean check
+
+While New_Plate = True
 
 
+If MsgBox("Enter another Compound Plate ID?", vbYesNo) = vbYes Then 'prompts user to input another id if they clicked yes
 
-'Request for compound plate value until all values have been entered
+Compound_Plates.Add InputBox("Please enter the compound plate ID", "Compound Plates")
 
-Other_Plate = True
-Plate_Count = 1
+Else
 
-While Other_Plate = True
-
-Compound_Plate(Plate_Count) = InputBox("Please enter the compound plate ID")
-MsgBox (Compound_Plate(Plate_Count))
-
-Response = InputBox("Enter another compound plate ID [y/n]?")
-
-If Response = "n" Then
-
-Other_Plate = False
+New_Plate = False ' if they click no then New_Plates value is changed to break the while loop
 
 End If
-
-Plate_Count = Plate_Count + 1
 Wend
 
+'For each Compound Plate ID
+'Concatenate the ID at the end of each assay value
 
+Cells(1, 14).Value = "West_Label(Echo)" 'West barcode values
+Cells(1, 15).Value = "South_Label(Text)" 'South barcode values
+Row_Start = 2 ' Starting row of the output table
 
+For ID = 1 To Compound_Plates.Count
 
+For Assay = 1 To (SFTY.Count - 1)
 
+Cells(Row_Start, 14).Value = SFTY(Assay) & "_" & Compound_Plates(ID)
+Cells(Row_Start, 15).Value = SFTY(Assay) & "_" & Compound_Plates(ID)
 
+Row_Start = Row_Start + 1
+
+Next Assay
+Next ID
 
 
 
